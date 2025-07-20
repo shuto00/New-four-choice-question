@@ -102,6 +102,7 @@ function handleAnswer(el) {
 
   const nextBtn = document.createElement('button');
   nextBtn.textContent = '次の問題へ';
+  nextBtn.className = 'start-button';
   nextBtn.style.marginTop = '1rem';
   nextBtn.addEventListener('click', () => {
     currentIndex++;
@@ -112,13 +113,13 @@ function handleAnswer(el) {
 
 function showEnd() {
   let html = '<h2>セット終了！</h2>';
-  if (!reviewMode && wrongQuestions.length > 0) {
+  if (wrongQuestions.length > 0) {
     html += `<p>不正解の問題があります。復習しますか？</p>
-      <button id="reviewBtn">復習する</button>
-      <button id="nextSetBtn">次の出題</button>`;
+      <button id="reviewBtn" class="start-button">復習する</button>
+      <button id="nextSetBtn" class="start-button">次の出題</button>`;
   } else {
     html += `<p>次の問題を続けますか？</p>
-      <button id="nextSetBtn">次の出題</button>`;
+      <button id="nextSetBtn" class="start-button">次の出題</button>`;
   }
   app.innerHTML = html;
 
@@ -147,4 +148,9 @@ backToTop.addEventListener('click', () => {
   if (confirm('出題がリセットされます。TOPに戻りますか？')) {
     location.reload();
   }
+});
+
+window.addEventListener('beforeunload', function (e) {
+  e.preventDefault();
+  e.returnValue = 'このページを離れると出題がリセットされます。よろしいですか？';
 });
