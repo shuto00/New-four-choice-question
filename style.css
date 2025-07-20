@@ -5,6 +5,36 @@ body {
   color: #333;
 }
 
+#top-screen {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+.start-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.start-buttons button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.start-buttons button:hover {
+  background-color: #0056b3;
+}
+
 #app {
   max-width: 600px;
   margin: 0 auto;
