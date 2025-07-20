@@ -7,7 +7,17 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="app"></div>
+  <div id="top-screen">
+    <h1>クイズを始める</h1>
+    <p>出題数を選択してください</p>
+    <div class="start-buttons">
+      <button data-count="5">5問</button>
+      <button data-count="10">10問</button>
+      <button data-count="all">全問</button>
+    </div>
+  </div>
+
+  <div id="app" style="display:none;"></div>
 
   <button id="backToTop">TOPへ</button>
 
