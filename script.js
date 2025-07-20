@@ -1,27 +1,62 @@
+const topScreen = document.getElementById('top-screen');
 const app = document.getElementById('app');
 const backToTop = document.getElementById('backToTop');
 
-let questions = [];
+let allQuestions = [];
+let currentSet = [];
 let currentIndex = 0;
-let usedQuestions = new Set();
+let usedIds = new Set();
+let wrongQuestions = [];
+let reviewMode = false;
 let currentQuestion = null;
 let answerLocked = false;
+let selectedCount = 0;
 
 fetch('questions.json')
   .then(res => res.json())
   .then(data => {
-    questions = shuffleArray(data);
-    showQuestion();
+    allQuestions = data;
+    setupTopScreen();
   });
 
+function setupTopScreen() {
+  document.querySelectorAll('.start-buttons button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const count = btn.dataset.count;
+      selectedCount = count === 'all' ? allQuestions.length : parseInt(count);
+      startNewSet();
+    });
+  });
+}
+
+function startNewSet() {
+  const remaining = allQuestions.filter(q => !usedIds.has(q.id));
+  currentSet = shuffleArray(remaining).slice(0, selectedCount);
+  currentSet.forEach(q => usedIds.add(q.id));
+  currentIndex = 0;
+  wrongQuestions = [];
+  reviewMode = false;
+  topScreen.style.display = 'none';
+  app.style.display = 'block';
+  showQuestion();
+}
+
+function startReviewSet() {
+  currentSet = [...wrongQuestions];
+  currentIndex = 0;
+  wrongQuestions = [];
+  reviewMode = true;
+  showQuestion();
+}
+
 function showQuestion() {
-  if (currentIndex >= questions.length) {
+  if (currentIndex >= currentSet.length) {
     showEnd();
     return;
   }
 
   answerLocked = false;
-  currentQuestion = questions[currentIndex];
+  currentQuestion = currentSet[currentIndex];
   const { question, choices } = currentQuestion;
 
   app.innerHTML = `
@@ -45,6 +80,10 @@ function handleAnswer(el) {
 
   const selectedId = el.dataset.id;
   const correctId = currentQuestion.answer;
+
+  if (selectedId !== correctId) {
+    wrongQuestions.push(currentQuestion);
+  }
 
   document.querySelectorAll('.choice').forEach(choice => {
     const id = choice.dataset.id;
@@ -72,10 +111,27 @@ function handleAnswer(el) {
 }
 
 function showEnd() {
-  app.innerHTML = `
-    <h2>Congratulations!</h2>
-    <p>全ての問題が終了しました。</p>
-  `;
+  let html = '<h2>セット終了！</h2>';
+  if (!reviewMode && wrongQuestions.length > 0) {
+    html += `<p>不正解の問題があります。復習しますか？</p>
+      <button id="reviewBtn">復習する</button>
+      <button id="nextSetBtn">次の出題</button>`;
+  } else {
+    html += `<p>次の問題を続けますか？</p>
+      <button id="nextSetBtn">次の出題</button>`;
+  }
+  app.innerHTML = html;
+
+  document.getElementById('nextSetBtn').addEventListener('click', () => {
+    startNewSet();
+  });
+
+  const reviewBtn = document.getElementById('reviewBtn');
+  if (reviewBtn) {
+    reviewBtn.addEventListener('click', () => {
+      startReviewSet();
+    });
+  }
 }
 
 function shuffleArray(arr) {
